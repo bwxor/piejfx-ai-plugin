@@ -26,7 +26,6 @@ public class ConfigurationService {
             for (int i = 0; i < array.length(); i++) {
                 Model model = Model.parse(array.getJSONObject(i).getString("model"));
                 String key = array.getJSONObject(i).getString("key");
-                System.out.println("reading model " + model.getValue());
                 configurationState.getKeys().put(model, key);
             }
         }
@@ -58,9 +57,9 @@ public class ConfigurationService {
             JSONObject config = new JSONObject();
             root.put("config", config);
             JSONArray keys = new JSONAPIKeyBuilder()
-                    .withModel(Model.GEMINI, "")
-                    .withModel(Model.CHATGPT, "")
-                    .withModel(Model.CLAUDE, "")
+                    .withModel(Model.GEMINI_2_5_FLASH_LITE, "")
+                    .withModel(Model.CHATGPT_4O, "")
+                    .withModel(Model.CLAUDE_3_5_SONNET, "")
                     .build();
 
             config.put("keys", keys);

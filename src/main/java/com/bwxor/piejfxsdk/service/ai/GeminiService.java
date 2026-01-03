@@ -15,7 +15,7 @@ public class GeminiService implements AIService {
 
     @Override
     public Model getModel() {
-        return Model.GEMINI;
+        return Model.GEMINI_2_5_FLASH_LITE;
     }
 
     @Override

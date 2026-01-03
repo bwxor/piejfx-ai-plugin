@@ -14,6 +14,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import one.jpro.platform.mdfx.MarkdownView;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -32,10 +33,9 @@ public class TabFactory {
         vbox.setSpacing(10);
         vbox.setPadding(new Insets(5, 5, 5, 5));
 
+
         TextArea responseTextArea = new TextArea();
-        responseTextArea.setEditable(false);
-        responseTextArea.setWrapText(true);
-        responseTextArea.setPromptText("➤ The assistant response will be displayed here.");
+        responseTextArea.setText("➤ The assistant response will be displayed here.");
         vbox.getChildren().add(responseTextArea);
         VBox.setVgrow(responseTextArea, Priority.ALWAYS);
 
@@ -55,31 +55,26 @@ public class TabFactory {
                     String prompt = promptTextArea.getText();
 
                     try {
-                        responseTextArea.setPromptText("Thinking...");
-                        responseTextArea.clear();
+                        responseTextArea.setText("Thinking...");
+                        promptTextArea.clear();
                         promptTextArea.setEditable(false);
-                        System.out.println("Key: " + configurationState.getKeys().getOrDefault(aiService.getModel(), EMPTY_STRING));
 
-                        CompletableFuture.supplyAsync(() -> {
-                                            System.out.println("Starting API call...");
-                                            return aiService.generateContent(configurationState.getKeys().getOrDefault(
-                                                    aiService.getModel(), EMPTY_STRING
-                                            ), prompt);
-                                        }
+                        CompletableFuture.supplyAsync(() -> aiService.generateContent(configurationState.getKeys().getOrDefault(
+                                aiService.getModel(), EMPTY_STRING
+                        ), prompt)
                                 ).orTimeout(15, TimeUnit.SECONDS)
                                 .thenAccept(
                                         responseTextArea::setText
                                 ).thenRun(() ->
                                         promptTextArea.setEditable(true)
                                 ).exceptionally(ex -> {
-                                    System.out.println(ex.getMessage());
-                                    responseTextArea.setPromptText(ex.getMessage());
+                                    responseTextArea.setText(ex.getMessage());
                                     promptTextArea.setEditable(true);
                                     return null;
                                 });
 
                     } catch (Exception ex) {
-                        responseTextArea.setPromptText(ex.getMessage());
+                        responseTextArea.setText(ex.getMessage());
                         promptTextArea.setEditable(true);
                     }
 
@@ -122,13 +117,13 @@ public class TabFactory {
 
         ComboBox<String> modelComboBox = new ComboBox<>();
         modelHBox.getChildren().add(modelComboBox);
-        modelComboBox.setItems(FXCollections.observableArrayList("Gemini", "ChatGPT", "Claude"));
+        modelComboBox.setItems(FXCollections.observableArrayList(Model.GEMINI_2_5_FLASH_LITE.getValue(), Model.CHATGPT_4O.getValue(), Model.CLAUDE_3_5_SONNET.getValue()));
         modelComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             serviceState.setAiService(
                     switch (Model.parse(newValue.toLowerCase())) {
-                        case GEMINI -> new GeminiService();
-                        case CHATGPT -> new ChatGPTService();
-                        case CLAUDE -> new ClaudeService();
+                        case GEMINI_2_5_FLASH_LITE -> new GeminiService();
+                        case CHATGPT_4O -> new ChatGPTService();
+                        case CLAUDE_3_5_SONNET -> new ClaudeService();
                     }
             );
 

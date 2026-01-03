@@ -7,6 +7,9 @@ module com.bwxor.piejfxsdk {
     requires javafx.graphics;
     requires google.genai;
     requires org.json;
+    requires api;
+    requires service;
+    requires java.net.http;
 
     opens com.bwxor.piejfxsdk to javafx.fxml;
     exports com.bwxor.piejfxsdk;

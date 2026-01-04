@@ -32,6 +32,11 @@
             <version>11.2.1</version>
         </dependency>
         <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>21.0.6</version>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
@@ -63,13 +68,28 @@
         <!-- Markdown Parsing -->
         <dependency>
             <groupId>io.github.raghul-tech</groupId>
-            <artifactId>javafx-markdown-preview-all</artifactId>
+            <artifactId>javafx-markdown-preview</artifactId>
             <version>1.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-all</artifactId>
+            <version>0.64.8</version>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <configuration>
+                    <options>
+                        <option>--add-exports</option>
+                        <option>io.github.raghultech.markdown.javafx.preview/io.github.raghultech.markdown.javafx.preview=com.bwxor.piejfxsdk.factory.TabFactory</option>
+                    </options>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

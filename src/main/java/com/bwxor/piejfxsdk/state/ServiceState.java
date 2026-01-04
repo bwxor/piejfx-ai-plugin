@@ -3,11 +3,13 @@ package com.bwxor.piejfxsdk.state;
 import com.bwxor.piejfxsdk.service.ConfigurationService;
 import com.bwxor.piejfxsdk.service.ai.AIService;
 import com.bwxor.plugin.service.PluginNotificationService;
+import javafx.application.HostServices;
 
 public class ServiceState {
     private AIService aiService;
     private PluginNotificationService pluginNotificationService;
     private ConfigurationService configurationService;
+    private HostServices hostServices;
     public static final ServiceState instance = new ServiceState();
 
     private ServiceState() {}
@@ -34,5 +36,13 @@ public class ServiceState {
 
     public void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
+    }
+
+    public HostServices getHostServices() {
+        return hostServices;
+    }
+
+    public void setHostServices(HostServices hostServices) {
+        this.hostServices = hostServices;
     }
 }

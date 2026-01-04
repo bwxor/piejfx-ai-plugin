@@ -22,6 +22,7 @@ public class AIPlugin implements Plugin {
         configurationState.setConfigurationDirectory(pluginContext.getConfigurationDirectoryPath());
         serviceState.setPluginNotificationService(pluginContext.getServiceContainer().getNotificationService());
         serviceState.setConfigurationService(new ConfigurationService());
+        serviceState.setHostServices(pluginContext.getHostServices());
 
         try {
             serviceState.getConfigurationService().loadAPIKeys();

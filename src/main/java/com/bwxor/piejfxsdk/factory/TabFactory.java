@@ -7,6 +7,8 @@ import com.bwxor.piejfxsdk.service.ai.GeminiService;
 import com.bwxor.piejfxsdk.state.ConfigurationState;
 import com.bwxor.piejfxsdk.state.ServiceState;
 import com.bwxor.piejfxsdk.type.Model;
+import com.google.genai.types.CreateFileResponse;
+import io.github.raghultech.markdown.javafx.preview.MarkdownWebView;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -33,14 +35,17 @@ public class TabFactory {
         vbox.setPadding(new Insets(5, 5, 5, 5));
 
 
-        TextArea responseTextArea = new TextArea();
-        responseTextArea.setWrapText(true);
-        responseTextArea.setText("➤ The assistant response will be displayed here.");
-        vbox.getChildren().add(responseTextArea);
-        VBox.setVgrow(responseTextArea, Priority.ALWAYS);
+        MarkdownWebView responseWebView = new MarkdownWebView("", serviceState.getHostServices());
+        responseWebView.setDarkMode(true);
+        responseWebView.setContent("The assistant's response will be displayed here.");
+        vbox.getChildren().add(responseWebView.getWebView());
+
+        VBox.setVgrow(responseWebView.getWebView(), Priority.ALWAYS);
 
         TextArea promptTextArea = new TextArea();
         promptTextArea.setWrapText(true);
+        promptTextArea.setMinHeight(100);
+        promptTextArea.setPrefRowCount(5);
         promptTextArea.setPromptText("Press ENTER to send the prompt, SHIFT + ENTER for new line.");
         promptTextArea.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
@@ -52,41 +57,42 @@ public class TabFactory {
                 } else {
                     AIService aiService = serviceState.getAiService();
 
-                    String prompt = promptTextArea.getText();
+                    if (aiService == null || aiService.getModel() == null) {
+                        serviceState.getPluginNotificationService().showNotificationOk("Choose an AI model before sending any prompts.");
+                    } else {
+                        String prompt = promptTextArea.getText();
 
-                    try {
-                        responseTextArea.setText("Thinking...");
-                        promptTextArea.clear();
-                        promptTextArea.setEditable(false);
+                        try {
+                            responseWebView.setContent("Thinking...");
+                            promptTextArea.clear();
+                            promptTextArea.setEditable(false);
 
-                        CompletableFuture.supplyAsync(() -> aiService.generateContent(configurationState.getKeys().getOrDefault(
-                                aiService.getModel(), EMPTY_STRING
-                        ), prompt)
-                                ).orTimeout(15, TimeUnit.SECONDS)
-                                .thenAccept(
-                                        responseTextArea::setText
-                                ).thenRun(() ->
-                                        promptTextArea.setEditable(true)
-                                ).exceptionally(ex -> {
-                                    responseTextArea.setText(ex.getMessage());
-                                    promptTextArea.setEditable(true);
-                                    return null;
-                                });
+                            CompletableFuture.supplyAsync(() -> aiService.generateContent(configurationState.getKeys().getOrDefault(
+                                                    aiService.getModel(), EMPTY_STRING
+                                            ), prompt)
+                                    ).orTimeout(15, TimeUnit.SECONDS)
+                                    .thenAccept(
+                                            responseWebView::setContent
+                                    ).thenRun(() ->
+                                            promptTextArea.setEditable(true)
+                                    ).exceptionally(ex -> {
+                                        responseWebView.setContent(ex.getMessage());
+                                        promptTextArea.setEditable(true);
+                                        return null;
+                                    });
 
-                    } catch (Exception ex) {
-                        responseTextArea.setText(ex.getMessage());
-                        promptTextArea.setEditable(true);
+                        } catch (Exception ex) {
+                            responseWebView.setContent(ex.getMessage());
+                            promptTextArea.setEditable(true);
+                        }
                     }
 
                     promptTextArea.clear();
-
                     e.consume();
                 }
             }
         });
-        vbox.getChildren().
-
-                add(promptTextArea);
+        vbox.getChildren().add(promptTextArea);
 
         return tab;
     }

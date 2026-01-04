@@ -14,7 +14,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import one.jpro.platform.mdfx.MarkdownView;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +34,7 @@ public class TabFactory {
 
 
         TextArea responseTextArea = new TextArea();
+        responseTextArea.setWrapText(true);
         responseTextArea.setText("➤ The assistant response will be displayed here.");
         vbox.getChildren().add(responseTextArea);
         VBox.setVgrow(responseTextArea, Priority.ALWAYS);
